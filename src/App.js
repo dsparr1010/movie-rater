@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import MovieList from './components/movie-list';
+import MovieDetails from './components/movie-details';
 
 function App() {
 
-  const [movies, setMovies] = useState(['Titanic', 'Bowling for Columbine']);
+  const [movies, setMovies] = useState([]);
+  const [selectedMovie, setSelectedMovie] = useState(null);
 
   useEffect( () => {
     fetch('http://127.0.0.1:8000/api/movies/', {
@@ -13,13 +16,19 @@ function App() {
         'Authorization' : 'Token d26712fb4cb944b475abf030960028e78c27fe14'
       }
     }).then( res => {
-      res.json()
+      return res.json()
     }).then( res => {
-      setMovies(res)
+      return setMovies(res)
     }).catch( err => {
       console.log(err)
+      throw err;
     })
   }, [])
+
+
+  const movieClicked = movie => {
+    setSelectedMovie(movie)
+  }
 
 
   return (
@@ -28,14 +37,8 @@ function App() {
         <h1>Movie Rater</h1>
       </header>
         <div className = "layout">
-          <div>Movie List
-            <div>
-              {movies.map( movie => {
-                return <h4>{movie}</h4>
-              })}
-            </div>
-          </div>
-          <div>Movie Detail</div>
+          <MovieList movies = {movies} movieClicked={movieClicked} ></MovieList>
+          <MovieDetails movie={selectedMovie}></MovieDetails>
         </div>
     </div>
   );
