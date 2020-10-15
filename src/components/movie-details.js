@@ -1,15 +1,49 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState, useEffect } from 'react';
-import { faCheckSquare, faStar } from '@fortawesome/free-solid-svg-icons'
+import { faStar } from '@fortawesome/free-solid-svg-icons'
 
 
 function MovieDetails(props) {
+    const [ highlighted, setHighlighted ] = useState(-1)
 
-    const print = something => {
-        console.log(something)
+    let mov = props.movie;
+
+    const highlightRate = high => evt => {
+        setHighlighted(high)
     }
 
-    const mov = props.movie;
+    const rateClicked = rate => evt => {
+        fetch(`http://127.0.0.1:8000/api/movies/${mov.id}/rate_movie/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization' : 'Token d26712fb4cb944b475abf030960028e78c27fe14'
+            },
+            body: JSON.stringify({stars: rate+1})
+        }).then( () => {
+            getDetails()
+        }).catch( err => {
+            console.log(err)
+            throw err;
+        })
+    }
+
+    const getDetails = () => {
+        fetch(`http://127.0.0.1:8000/api/movies/${mov.id}/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization' : 'Token d26712fb4cb944b475abf030960028e78c27fe14'
+            }
+        }).then( res => {
+            return res.json()
+        }).then( res => {
+            props.updateMovie(res)
+        }).catch( err => {
+            console.log(err)
+            throw err;
+        })
+    }
 
     return (
         <React.Fragment>
@@ -26,7 +60,11 @@ function MovieDetails(props) {
                     <div className="rate-container">
                         <h2>Rate It</h2>
                         { [...Array(5)].map( (element, index) => {
-                            return <FontAwesomeIcon icon={faStar} className={mov.avg_rating > 0 ? "purple" : ''}/>
+                            return <FontAwesomeIcon key = {index} icon={faStar} className={highlighted > index-1 ? "purple" : ''}
+                                    onMouseEnter={highlightRate(index)}
+                                    onMouseLeave={highlightRate(-1)}
+                                    onClick={rateClicked(index)}
+                            />
                         })
                         }
                     </div>
