@@ -1,31 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilm, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import MovieList from './components/movie-list';
 import MovieDetails from './components/movie-details';
 import MovieForm from './components/movie-form';
+import { useCookies } from 'react-cookie';
+import { useFetch } from './hooks/useFetch';
 
 function App() {
 
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [editedMovie, setEditedMovie] = useState(null)
+  const [token, setToken, deleteToken] = useCookies(['mr-token'])
+  const [data, loading, error] = useFetch()
 
   useEffect( () => {
-    fetch('http://127.0.0.1:8000/api/movies/', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization' : 'Token d26712fb4cb944b475abf030960028e78c27fe14'
-      }
-    }).then( res => {
-      return res.json()
-    }).then( res => {
-      return setMovies(res)
-    }).catch( err => {
-      console.log(err)
-      throw err;
-    })
-  }, [])
+    setMovies(data)
+  }, [data])
+
+  useEffect( () => {
+    if (!token['mr-token']) window.location.href = '/'
+  }, [token])
 
   const loadMovie = movie => {
     setSelectedMovie(movie)
@@ -62,11 +59,21 @@ function App() {
     setMovies(newMovies)
   }
 
+  const logoutUser = () => {
+    deleteToken(['mr-token'])
+  }
+
+  if (loading) return <h1>Loading...</h1>
+  if (error) return <h1>Error loading movies</h1>
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Movie Rater</h1>
+        <h1>
+          <FontAwesomeIcon icon={faFilm} />
+          Movie Rater
+        </h1>
+        <FontAwesomeIcon icon={faSignOutAlt} onClick={logoutUser} />
       </header>
         <div className = "layout">
           <div>
@@ -80,14 +87,14 @@ function App() {
               onClick={ newMovie }
               >New Movie</button>
           </div>
-          <MovieDetails 
-            movie={selectedMovie} 
+          <MovieDetails
+            movie={selectedMovie}
             updateMovie={loadMovie}
             ></MovieDetails>
           { editedMovie ?
-            <MovieForm 
-              movie={editedMovie} 
-              updatedMovie={updatedMovie} 
+            <MovieForm
+              movie={editedMovie}
+              updatedMovie={updatedMovie}
               movieCreated={movieCreated}
               ></MovieForm>
             : null

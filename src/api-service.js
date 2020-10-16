@@ -1,36 +1,34 @@
-const TOKEN = 'd26712fb4cb944b475abf030960028e78c27fe14'
-
 export class API {
-    static updateMovie(mov_id, body) {
+    static updateMovie(mov_id, body, token) {
         return fetch(`http://127.0.0.1:8000/api/movies/${mov_id}/`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : `Token ${TOKEN}`
+                'Authorization' : `Token ${token}`
             },
             body: JSON.stringify(body)
         })
         .then(res => res.json())
     }
 
-    static createMovie(body) {
+    static createMovie(body, token) {
         return fetch(`http://127.0.0.1:8000/api/movies/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : `Token ${TOKEN}`
+                'Authorization' : `Token ${token}`
             },
             body: JSON.stringify(body)
         })
         .then(res => res.json())
     }
 
-    static deleteMovie(mov_id) {
+    static deleteMovie(mov_id, token) {
         return fetch(`http://127.0.0.1:8000/api/movies/${mov_id}/`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization' : `Token ${TOKEN}`
+                'Authorization' : `Token ${token}`
             }
         })
     }
@@ -44,5 +42,26 @@ export class API {
             body: JSON.stringify(body)
         })
         .then(res => res.json())
+    }
+
+    static registerUser(body) {
+        return fetch(`http://127.0.0.1:8000/api/users/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        })
+        .then(res => res.json())
+    }
+
+    static getMovies(token){
+        return fetch('http://127.0.0.1:8000/api/movies/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization' : `Token ${token}`
+            }
+        }).then( res => res.json() )
     }
 }

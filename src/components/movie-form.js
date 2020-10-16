@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {API} from '../api-service';
+import { useCookies } from 'react-cookie';
+
 
 function MovieForm(props) {
 
     const [ title, setTitle ] = useState('')
     const [ description, setDescription ] = useState('')
+    const [token] = useCookies(['mr-token'])
 
     useEffect( () => {
         setTitle(props.movie.title)
@@ -13,17 +16,19 @@ function MovieForm(props) {
 
     const updateClicked = () => {
         console.log('update here')
-        API.updateMovie(props.movie.id, {title, description})
+        API.updateMovie(props.movie.id, {title, description, token})
         .then(res => props.updatedMovie(res))
         .catch( err => console.log(err))
     }
 
     const createClicked = () => {
         console.log('update here')
-        API.createMovie({title, description})
+        API.createMovie({title, description, token})
         .then(res => props.movieCreated(res))
         .catch( err => console.log(err))
     }
+
+    const isDisabled = title.length === 0 || description.length === 0
 
     return(
         <React.Fragment>
@@ -47,9 +52,9 @@ function MovieForm(props) {
                         onChange={ evt => setDescription(evt.target.value) }
                         ></textarea><br/>
                         {   props.movie.id ? (
-                            <button onClick={ updateClicked }>Update</button>
+                            <button onClick={ updateClicked } disabled={isDisabled}>Update</button>
                         ) : (
-                            <button onClick={ createClicked }>Create</button>
+                            <button onClick={ createClicked } disabled={isDisabled}>Create</button>
                         )
                         }
                 </div>
