@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {API} from '../api-service';
 
 function MovieList(props) {
 
-    const print = something => {
-        console.log(something)
-    }
-
     const movieClicked = movie => evt => {
-        print(movie)
         props.movieClicked(movie)
     }
 
     const editClicked = movie => {
         props.editClicked(movie)
+    }
+
+    const removeClicked = movie => {
+        API.deleteMovie(movie.id)
+            .then( () => props.removeClicked(movie))
+            .catch( err => console.log(err))
     }
 
     return (
@@ -26,7 +28,7 @@ function MovieList(props) {
                         <div key = {movie.id} className='movie-item'>
                             <h4 onClick = {movieClicked(movie)}>{movie.title}</h4>
                             <FontAwesomeIcon icon={faEdit} onClick={() => editClicked(movie)} />
-                            <FontAwesomeIcon icon={faTrash} />
+                            <FontAwesomeIcon icon={faTrash} onClick={() => removeClicked(movie)} />
                         </div>
                     )
                 })}
